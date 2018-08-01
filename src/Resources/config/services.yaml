@@ -1,0 +1,8 @@
+services:
+    Mesavolt\ImagingBundle\Service\ImagingService:
+        class: Mesavolt\ImagingBundle\Service\ImagingService
+        public: false
+
+    mesavolt.image:
+        alias: Mesavolt\ImagingBundle\Service\ImagingService
+        public: true

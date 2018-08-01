@@ -1,0 +1,39 @@
+{
+    "name": "mesavolt/imaging-bundle",
+    "description": "Symfony bundle to facilitate image manipulation in PHP",
+    "keywords": ["image", "gd", "webp", "bundle"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "MesaVolt",
+            "email": "contact@mesavolt.com"
+        }
+    ],
+    "type": "symfony-bundle",
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "php": ">=7.1",
+        "ext-gd": "*",
+        "ext-exif": "*",
+        "rosell-dk/webp-convert": "^1.1",
+        "symfony/config": "^3.3||^4.1",
+        "symfony/dependency-injection": "^3.3||^4.1",
+        "symfony/http-kernel": "^3.3||^4.1"
+    },
+	"require-dev": {
+        "php-coveralls/php-coveralls": "^2.1",
+        "phpunit/phpunit": "^7.2"
+    },
+	"autoload": {
+        "psr-4": {
+            "Mesavolt\\ImagingBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mesavolt\\Tests\\": "Tests/"
+        }
+    }
+}
