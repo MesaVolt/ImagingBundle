@@ -105,9 +105,12 @@ class ImagingService
             case IMAGETYPE_PNG:
                 return imagecreatefrompng($source);
                 break;
-            case IMAGETYPE_BMP:
+            /**
+             * PHP>=7.2 only
+             case IMAGETYPE_BMP:
                 return imagecreatefrombmp($source);
                 break;
+             */
             case IMAGETYPE_WEBP:
                 return imagecreatefromwebp($source);
                 break;
