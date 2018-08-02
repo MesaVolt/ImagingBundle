@@ -49,10 +49,6 @@ class ImageServiceTest extends TestCase
             $this->assertTrue($this->service->shrink(__DIR__."/../Resources/images/$ext.$ext", $this->createTempFile(), 1));
         }
 
-        // doesn't handle tiff
-        $this->expectException(\InvalidArgumentException::class);
-        $this->assertTrue($this->service->shrink(__DIR__."/../Resources/images/tiff.tiff", $this->createTempFile(), 1));
-
         // shrinks horizontal image to match width
         $tallShrunkW = $this->createTempFile();
         $this->service->shrink($this->tall, $tallShrunkW, 100, null);
@@ -118,6 +114,10 @@ class ImageServiceTest extends TestCase
 
         // __FILE__ is not an image, shrinking fails and returns false
         $this->assertFalse($this->service->shrink(__FILE__, '/dev/null'));
+
+        // doesn't handle tiff
+        $this->expectException(\InvalidArgumentException::class);
+        $this->service->shrink(__DIR__."/../Resources/images/tiff.tiff", $this->createTempFile(), 1);
     }
 
     public function testGenerateWebp()
