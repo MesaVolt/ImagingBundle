@@ -1,5 +1,7 @@
 # Mesavolt/ImagingBundle
 
+[![Build Status](https://travis-ci.org/MesaVolt/ImagingBundle.svg?branch=master)](https://travis-ci.org/MesaVolt/ImagingBundle)
+[![Coverage Status](https://coveralls.io/repos/github/MesaVolt/ImagingBundle/badge.svg?branch=master)](https://coveralls.io/github/MesaVolt/ImagingBundle?branch=master)
 
 ## Installation
 
