@@ -11,6 +11,30 @@ class ImagingService
     public const DEFAULT_JPEG_QUALITY = 85;
     public const DEFAULT_WEBP_QUALITY = 85;
 
+    private const TRANSPARENT_FORMATS = [
+        IMAGETYPE_GIF, IMAGETYPE_PNG, IMAGETYPE_WEBP
+    ];
+
+    /** @var array */
+    protected $transparencyReplacement;
+
+    public function __construct(?string $transparencyReplacement = null)
+    {
+        if ($transparencyReplacement !== null) {
+            $this->transparencyReplacement = $this->colorStringToRgbArray($transparencyReplacement);
+        }
+    }
+
+    protected function colorStringToRgbArray(string $string): array
+    {
+        $color = trim(ltrim($string, '#'));
+        if (strlen($color) !== 6) {
+            throw new \InvalidArgumentException("Invalid color `$string`, color must be provided in the #RRGGBB format");
+        }
+
+        return array_map('hexdec', str_split($color, 2));
+    }
+
     /**
      * Shrink an image to at most $width and/or $height while keeping its proportions, and compress it.
      * If the image is smaller than the specified $width or $height, or if no dimensions are specified,
@@ -48,7 +72,7 @@ class ImagingService
 
     protected function resize(string $source, ?int $maxWidth = null, ?int $maxHeight = null)
     {
-        [$originalWidth, $originalHeight] = getimagesize($source);
+        [$originalWidth, $originalHeight, $type] = getimagesize($source);
 
         if ($originalWidth === null || $originalHeight === null) {
             return null;
@@ -73,21 +97,22 @@ class ImagingService
             }
         }
 
+        $dst = imagecreatetruecolor($width, $height);
+
+        // replace transparent areas
+        if (in_array($type, self::TRANSPARENT_FORMATS) && $this->transparencyReplacement !== null) {
+            $transparencyReplacement = imagecolorallocate($dst, ...$this->transparencyReplacement);
+            imagefill($dst, 0, 0, $transparencyReplacement);
+        }
+
         $src = $this->createGdImage($source);
+        $resized = imagecopyresampled($dst, $src, 0, 0, 0, 0, $width, $height, $originalWidth, $originalHeight);
 
-        // resize only if necessary
-        if ($width === $originalWidth && $height === $originalHeight) {
-            $dst = $src;
-        } else {
-            $dst = imagecreatetruecolor($width, $height);
-            $resized = imagecopyresampled($dst, $src, 0, 0, 0, 0, $width, $height, $originalWidth, $originalHeight);
+        imagedestroy($src); // don't hog the RAM, we're not Slack or Chrome.
 
-            imagedestroy($src); // don't hog the RAM, we're not Slack or Chrome.
-
-            if (!$resized) {
-                $filename = basename($source);
-                throw new \RuntimeException("Couldn't resize $filename to [w:$maxWidth ; h:$maxHeight]");
-            }
+        if (!$resized) {
+            $filename = basename($source);
+            throw new \RuntimeException("Couldn't resize $filename to [w:$maxWidth ; h:$maxHeight]");
         }
 
         return $dst;

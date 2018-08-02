@@ -1,6 +1,8 @@
 services:
     Mesavolt\ImagingBundle\Service\ImagingService:
         class: Mesavolt\ImagingBundle\Service\ImagingService
+        arguments:
+            $transparencyReplacement: '%imaging.transparency_replacement%'
         public: false
 
     mesavolt.image:

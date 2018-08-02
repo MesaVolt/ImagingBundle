@@ -132,4 +132,20 @@ class ImageServiceTest extends TestCase
         // generated image must be webp
         $this->assertEquals(IMAGETYPE_WEBP, exif_imagetype($webp));
     }
+
+    public function testPngTransparencyReplacement()
+    {
+        $whiteService = new ImagingService('#FFFFFF');
+        $whiteImage = $this->createTempFile();
+        $whiteService->shrink(__DIR__.'/../Resources/images/transparent.png', $whiteImage);
+
+        $gd = imagecreatefromjpeg($whiteImage);
+        $color = imagecolorat($gd, 1, 1);
+        ['red' => $r, 'green' => $g, 'blue' => $b, 'alpha' => $a] = imagecolorsforindex($gd, $color);
+
+        $this->assertEquals(255, $r, "Transparent image shoud be RED(255, 255, 255, 0), instead is X($r, $g, $b, $a)");
+        $this->assertEquals(255, $g, "Transparent image shoud be RED(255, 255, 255, 0), instead is X(255, $g, $b, $a)");
+        $this->assertEquals(255, $b,"Transparent image shoud be RED(255, 255, 255, 0), instead is X(255, 255, $b, $a)");
+        $this->assertEquals(0, $a, "Transparent image shoud be RED(255, 255, 255, 0), instead is X(255, 255, 255, $a)");
+    }
 }
