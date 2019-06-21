@@ -17,7 +17,7 @@
         "php": ">=7.1",
         "ext-gd": "*",
         "ext-exif": "*",
-        "rosell-dk/webp-convert": "^1.1",
+        "rosell-dk/webp-convert": "^2.1",
         "symfony/config": "^3.3||^4.1",
         "symfony/dependency-injection": "^3.3||^4.1",
         "symfony/http-kernel": "^3.3||^4.1"
