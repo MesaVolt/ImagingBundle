@@ -3,7 +3,7 @@
 namespace Mesavolt\ImagingBundle\Service;
 
 
-use WebPConvert\Exceptions\InvalidFileExtensionException;
+use WebPConvert\Convert\Exceptions\ConversionFailedException;
 use WebPConvert\WebPConvert;
 
 class ImagingService
@@ -60,11 +60,42 @@ class ImagingService
      */
     public function generateWebp(string $source, string $destination, int $quality = self::DEFAULT_WEBP_QUALITY): bool
     {
+        $ext = pathinfo($destination, PATHINFO_EXTENSION);
+        $realDestination = $destination;
+        if ($ext !== 'webp') {
+            $tmpFile = tempnam(sys_get_temp_dir(), 'imagingservice-temp-file');
+            $tmpFileWithExtension = "$tmpFile.webp";
+
+            if(!rename($tmpFile, $tmpFileWithExtension)) {
+                return false;
+            }
+
+            $realDestination = $tmpFileWithExtension;
+        }
+
+
         try {
-            return WebPConvert::convert($source, $destination, [
+            WebPConvert::convert($source, $realDestination, [
                 'quality' => $quality,
+                'converter' => 'cwebp',
+                'converter-options' => [
+                    'cwebp' => [
+                        'cwebp-try-cwebp' => false,
+                        'try-common-system-paths' => false,
+                        'try-discovering-cwebp' => false,
+                        'cwebp-try-supplied-binary-for-os' => true,
+                    ],
+                ],
             ]);
-        } catch (InvalidFileExtensionException $ex) {
+
+            if ($realDestination !== $destination) {
+                if (!rename($realDestination, $destination)) {
+                    return false;
+                }
+            }
+
+            return true;
+        } catch (ConversionFailedException $ex) {
             // Throws when trying to convert gifs
             return false;
         }
