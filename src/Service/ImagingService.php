@@ -101,6 +101,9 @@ class ImagingService
         }
     }
 
+    /**
+     * @return resource|null
+     */
     protected function resize(string $source, ?int $maxWidth = null, ?int $maxHeight = null)
     {
         [$originalWidth, $originalHeight, $type] = getimagesize($source);
@@ -149,6 +152,18 @@ class ImagingService
         return $dst;
     }
 
+    public function supports(string $source): bool
+    {
+        if (strpos(mime_content_type($source), 'image/') !== 0) {
+            return false;
+        }
+
+        return in_array(exif_imagetype($source), [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP], true);
+    }
+
+    /**
+     * @return resource
+     */
     protected function createGdImage(string $source)
     {
         switch ($imageType = exif_imagetype($source)) {

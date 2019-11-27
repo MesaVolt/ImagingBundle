@@ -118,7 +118,7 @@ class ImageServiceTest extends TestCase
 
         // doesn't handle tiff
         $this->expectException(\InvalidArgumentException::class);
-        $this->service->shrink(__DIR__."/../Resources/images/tiff.tiff", $this->createTempFile(), 1);
+        $this->service->shrink(__DIR__.'/../Resources/images/tiff.tiff', $this->createTempFile(), 1);
     }
 
     public function testGenerateWebp()
@@ -147,5 +147,16 @@ class ImageServiceTest extends TestCase
         $this->assertEquals(255, $g, "Transparent image shoud be RED(255, 255, 255, 0), instead is X(255, $g, $b, $a)");
         $this->assertEquals(255, $b,"Transparent image shoud be RED(255, 255, 255, 0), instead is X(255, 255, $b, $a)");
         $this->assertEquals(0, $a, "Transparent image shoud be RED(255, 255, 255, 0), instead is X(255, 255, 255, $a)");
+    }
+
+    public function testSupports()
+    {
+        // handles JPG, PNG and GIF
+        foreach (['jpg', 'gif', 'png', 'webp'] as $ext) {
+            $this->assertTrue($this->service->supports(__DIR__."/../Resources/images/$ext.$ext"));
+        }
+
+        $this->assertFalse($this->service->supports(__DIR__.'/../Resources/images/tiff.tiff'));
+        $this->assertFalse($this->service->supports(__FILE__));
     }
 }
